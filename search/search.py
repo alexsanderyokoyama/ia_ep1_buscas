@@ -87,107 +87,63 @@ def depthFirstSearch(problem):
     print "Start's successors:", problem.getSuccessors(problem.getStartState())
     """
     "*** YOUR CODE HERE ***"
-
-    # Initializes the stack
-    stack = util.Stack()
-
-    # Initializes array of visited states
-    visited = []
-
-    # Get initial pos
-    pos = problem.getStartState()
-    actionList = []
-
-    # Pushes initial state into stack
-    stack.push((pos, actionList))
+ 
+    # Pilha de nos
+    pilha = util.Stack()
+    # Array de coordenadas ja visitadas
+    coordVisitados = []
+    # No de inicio  (coordenada do no, direcao, caminho percorrido ate este no)
+    noInicial = (problem.getStartState(), None, [])
+    # Insere o primeiro inicial na lista de nos
+    pilha.push(noInicial) 
     
-    # Set initial pos as visited
-    visited.append(pos)
-    
-    # Run search while there are states to be checked
-    while not stack.isEmpty():
-        # Get current node from stack
-        currentNode = stack.pop()
-        pos = currentNode[0]
-        actionList = currentNode[1]
+    # Itera ate que a pilha esteja vazia
+    while not pilha.isEmpty():
+        atual = pilha.pop()                         # Remove o no do topo da pilha 
+        atualCoord = atual[0]                       # Guarda a coordenada do no atual
+        atualAcao = atual[1]                        # Guarda a acao (direcao) pela qual se chegou no no atual
+        atualCaminho = atual[2]                     # Guarda o caminho ate ter chegado neste no atual
+        if(atualCoord not in coordVisitados):       # Se o no atual ainda nao foi visitado, continuar
+            coordVisitados.append(atualCoord)       # Adiciona a coord do atual na lista de visitados
+            if(problem.isGoalState(atualCoord)):    # Se eh o objetivo, retorna o caminho ate chegar neste no
+				return atualCaminho 
+            sucessores = problem.getSuccessors(atualCoord)  # Encontrar todos os nos vizinhos
+            for sucessor in sucessores:                     # Expande os nos vizinhos, na sequencia da lista
+                if sucessor[0] not in coordVisitados:       # Se o vizinho ainda nao foi visitado, coloca na lista
+                    pilha.push((sucessor[0], sucessor[1], atualCaminho + [sucessor[1]]))
+    return[]
 
-        # Iterate all successors from current node
-        for successor in problem.getSuccessors(pos):
-            # Get successors pos and action from node
-            succPos = successor[0]
-            succAction = successor[1]
-            
-            # Check if successors are visited
-            if not visited.__contains__(succPos):
-                # Append successors action to action list (create new not to modify reference)
-                newList = list(actionList)
-                newList.append(succAction)
-
-                # Check if the goal was found
-                if problem.isGoalState(succPos):
-                    # Return action list
-                    print newList
-                    return newList
-                else:
-                    # Set node as visited and push to stack
-                    visited.append(succPos)
-                    stack.push((succPos, newList))
-            
-    # Return "Stop" action to do nothing if no path is found
-    return []
-
+  
+# Igual o depthFirstSearch, porem utilizando Fila em vez de Pilha
 def breadthFirstSearch(problem):
     """Search the shallowest nodes in the search tree first."""
-    "*** YOUR CODE HERE ***"
-    # Initializes the Queue
-    queue = util.Queue()
-
-    # Initializes array of visited states
-    visited = []
-
-    # Get initial pos
-    pos = problem.getStartState()
-    actionList = []
-
-    # Pushes initial state into stack
-    queue.push((pos, actionList))
+    # Fila de nos
+    fila = util.Queue()
+    # Array de coordenadas ja visitadas
+    coordVisitados = []
+    # No de inicio  (coordenada do no, direcao, caminho percorrido ate este no)
+    noInicial = (problem.getStartState(), None, [])
+    # Insere o primeiro inicial na lista de nos
+    fila.push(noInicial) 
     
-    # Set initial pos as visited
-    visited.append(pos)
+    # Itera ate que a fila esteja vazia
+    while not fila.isEmpty():
+        atual = fila.pop()                         # Remove o no do topo da fila 
+        atualCoord = atual[0]                       # Guarda a coordenada do no atual
+        atualAcao = atual[1]                        # Guarda a acao (direcao) pela qual se chegou no no atual
+        atualCaminho = atual[2]                     # Guarda o caminho ate ter chegado neste no atual
+        if(atualCoord not in coordVisitados):       # Se o no atual ainda nao foi visitado, continuar
+            coordVisitados.append(atualCoord)       # Adiciona a coord do atual na lista de visitados
+            if(problem.isGoalState(atualCoord)):    # Se eh o objetivo, retorna o caminho ate chegar neste no
+				return atualCaminho 
+            sucessores = problem.getSuccessors(atualCoord)  # Encontrar todos os nos vizinhos (sucessores)
+            for sucessor in sucessores:              # Expande os nos vizinhos, na sequencia da lista
+                if sucessor[0] not in coordVisitados:       # Se o vizinho ainda nao foi visitado, coloca na lista
+                    fila.push((sucessor[0], sucessor[1], atualCaminho + [sucessor[1]]))
+    return[]
+    util.raiseNotDefined()
+
     
-    # Run search while there are states to be checked
-    while not queue.isEmpty():
-        # Get current node from stack
-        currentNode = queue.pop()
-        pos = currentNode[0]
-        actionList = currentNode[1]
-
-        # Iterate all successors from current node
-        for successor in problem.getSuccessors(pos):
-            # Get successors pos and action from node
-            succPos = successor[0]
-            succAction = successor[1]
-            
-            # Check if successors are visited
-            if not visited.__contains__(succPos):
-                # Append successors action to action list (create new not to modify reference)
-                newList = list(actionList)
-                newList.append(succAction)
-
-                # Check if the goal was found
-                if problem.isGoalState(succPos):
-                    # Return action list
-                    print newList
-                    return newList
-                else:
-                    # Set node as visited and push to stack
-                    visited.append(succPos)
-                    queue.push((succPos, newList))
-            
-    # Return "Stop" action to do nothing if no path is found
-    return []
-
-
 def uniformCostSearch(problem):
     """Search the node of least total cost first."""
     "*** YOUR CODE HERE ***"
