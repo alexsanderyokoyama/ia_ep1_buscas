@@ -87,63 +87,32 @@ def depthFirstSearch(problem):
     print "Start's successors:", problem.getSuccessors(problem.getStartState())
     """
     "*** YOUR CODE HERE ***"
-
-    # Initializes the stack
-    stack = util.Stack()
-
-    # Initializes array of visited states
-    visited = []
-
-    # Initializes path list
-    path = []
-
-    # Pushes initial state into stack
-    stack.push([(problem.getStartState(), "Stop", 0)])
     
-    # Run search while there are states to be checked
-    while not stack.isEmpty():
-        # Get the path from the stack. 
-        path = stack.pop()
-        print(path)
-
-        # Get the current position (last path taken)
-        currentPosition = path[-1][0]
-        print "Current position is ", currentPosition
-        
-        # Check if current state is the goal, return the action path if true
-        if problem.isGoalState(currentPosition):
-            print "Current state is Goal State, returning path."
-            actionPath = []
-            for action in path:
-                actionPath.append(action[1])
-            return actionPath
-        else:
-            print "Current state is not Goal State, expanding."
-
-        # If theres only the initial state path, set path as empty
-        if(path == problem.getStartState):
-            path = []
-            
-        # Check if current state wasnt visited before
-        if currentPosition not in visited:
-            # Set state as visited
-            visited.append(currentPosition)
-
-            # Get successors of current state
-            successors = problem.getSuccessors(currentPosition)
-            for successor in successors:
-                # Check if successor position wasnt visited
-                successorPos = successor[0]
-                if successorPos not in visited:
-                    # If not, append successors path to current path
-                    successorPath = path[:]
-                    successorPath.append(successor)
-                    
-                    # Push the complete path to the stack
-                    stack.push(successorPath)
-            
-    # Return "Stop" action to do nothing if no path is found
-    return ["Stop"]
+    # Pilha de nos
+    pilha = util.Stack()
+    # Array de coordenadas ja visitadas
+    coordVisitados = []
+    # No de inicio  (coordenada do no, direcao, caminho percorrido ate este no)
+    noInicial = (problem.getStartState(), None, [])
+    # Insere o primeiro inicial na lista de nos
+    pilha.push(noInicial) 
+    
+    # Itera ate que a pilha esteja vazia
+    while not pilha.isEmpty():
+        atual = pilha.pop()                         # Remove o no do topo da pilha 
+        atualCoord = atual[0]                       # Guarda a coordenada do no atual
+        atualAcao = atual[1]                        # Guarda a acao (direcao) pela qual se chegou no no atual
+        atualCaminho = atual[2]                     # Guarda o caminho ate ter chegado neste no atual
+        if(atualCoord not in coordVisitados):       # Se o no atual ainda nao foi visitado, continuar
+            coordVisitados.append(atualCoord)       # Adiciona a coord do atual na lista de visitados
+            if(problem.isGoalState(atualCoord)):    # Se eh o objetivo, retorna o caminho ate chegar neste no
+				return atualCaminho 
+            sucessores = problem.getSuccessors(atualCoord)  # Encontrar todos os nos vizinhos
+            listaDeSucessores = list(sucessores)            # Cria lista para explorar os vizinhos
+            for sucessor in listaDeSucessores:              # Expande os nos vizinhos, na sequencia da lista
+                if sucessor[0] not in coordVisitados:       # Se o vizinho ainda nao foi visitado, coloca na lista
+                    pilha.push((sucessor[0], sucessor[1], atualCaminho + [sucessor[1]]))
+    return[]
 
 def breadthFirstSearch(problem):
     """Search the shallowest nodes in the search tree first."""
