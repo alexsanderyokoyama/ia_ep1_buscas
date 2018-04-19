@@ -87,8 +87,8 @@ def depthFirstSearch(problem):
     print "Start's successors:", problem.getSuccessors(problem.getStartState())
     """
     "*** YOUR CODE HERE ***"
-    
-    # fila de nos
+ 
+    # Pilha de nos
     pilha = util.Stack()
     # Array de coordenadas ja visitadas
     coordVisitados = []
@@ -113,6 +113,7 @@ def depthFirstSearch(problem):
                     pilha.push((sucessor[0], sucessor[1], atualCaminho + [sucessor[1]]))
     return[]
 
+  
 # Igual o depthFirstSearch, porem utilizando Fila em vez de Pilha
 def breadthFirstSearch(problem):
     """Search the shallowest nodes in the search tree first."""
@@ -142,7 +143,7 @@ def breadthFirstSearch(problem):
     return[]
     util.raiseNotDefined()
 
-
+    
 def uniformCostSearch(problem):
     """Search the node of least total cost first."""
     "*** YOUR CODE HERE ***"
