@@ -147,19 +147,16 @@ def uniformCostSearch(problem):
     """Search the node of least total cost first."""
     "*** YOUR CODE HERE ***"
 
-    # Define a funcao que define os custos da lista de acoes 
-    def ordenaCustos(caminho):
+    # Define a funcao que define o custo da lista de acoes 
+    def ordenaCustos(no):
         acoes = [] # Cria lista de acoes
-        if caminho is None:
+        if no is None:
             return # Retorna se caminho estiver vazio (estado inicial)
-        acoes = list(caminho[2]) # Clona lista de acoes do caminho
-        return problem.getCostOfActions(acoes) # Retorna lista de custos das acoes
-
-    # Armazena funcao de custos em um callback para ser utilizado na fila de prioridade
-    callback = ordenaCustos
+        acoes = list(no[2]) # Clona lista de acoes do caminho
+        return problem.getCostOfActions(acoes) # Retorna custo das acoes
 
     # Initializa fila de prioridade com o callback
-    filaPrioridade = util.PriorityQueueWithFunction(callback)
+    filaPrioridade = util.PriorityQueueWithFunction(ordenaCustos)
 
     # Array de coordenadas ja visitadas
     coordVisitados = []
@@ -195,7 +192,44 @@ def nullHeuristic(state, problem=None):
 def aStarSearch(problem, heuristic=nullHeuristic):
     """Search the node that has the lowest combined cost and heuristic first."""
     "*** YOUR CODE HERE ***"
-    util.raiseNotDefined()
+    
+    # Define a funcao que define o custo da lista de acoes 
+    def ordenaCustos(no):
+        acoes = [] # Cria lista de acoes
+        if no is None:
+            return # Retorna se caminho estiver vazio (estado inicial)
+        acoes = list(no[2]) # Clona lista de acoes do caminho
+        custoAcoes = problem.getCostOfActions(acoes)
+        custoHeuristico = heuristic(no[0], problem)
+        return custoAcoes + custoHeuristico # Retorna custos final (custo real + custo herusitica)
+    
+    # ordenaCustos = lambda path: problem.getCostOfActions([x[1] for x in path][1:])
+
+    # Initializa fila de prioridade com o callback
+    filaPrioridade = util.PriorityQueueWithFunction(ordenaCustos)
+
+    # Array de coordenadas ja visitadas
+    coordVisitados = []
+    # No de inicio  (coordenada do no, direcao, caminho percorrido ate este no)
+    noInicial = (problem.getStartState(), None, [])
+    # Insere o primeiro inicial na lista de nos
+    filaPrioridade.push(noInicial) 
+
+    # Itera ate que a fila esteja vazia
+    while not filaPrioridade.isEmpty():
+        atual = filaPrioridade.pop()                         # Remove o no do topo da fila 
+        atualCoord = atual[0]                       # Guarda a coordenada do no atual
+        # atualAcao = atual[1]                        # Guarda a acao (direcao) pela qual se chegou no no atual
+        atualCaminho = atual[2]                     # Guarda o caminho ate ter chegado neste no atual
+        if(atualCoord not in coordVisitados):       # Se o no atual ainda nao foi visitado, continuar
+            coordVisitados.append(atualCoord)       # Adiciona a coord do atual na lista de visitados
+            if(problem.isGoalState(atualCoord)):    # Se eh o objetivo, retorna o caminho ate chegar neste no
+				return atualCaminho 
+            sucessores = problem.getSuccessors(atualCoord)  # Encontrar todos os nos vizinhos (sucessores)
+            for sucessor in sucessores:              # Expande os nos vizinhos, na sequencia da lista
+                if sucessor[0] not in coordVisitados:       # Se o vizinho ainda nao foi visitado, coloca na lista
+                    filaPrioridade.push((sucessor[0], sucessor[1], atualCaminho + [sucessor[1]]))
+    return[]
 
 
 def learningRealTimeAStar(problem, heuristic=nullHeuristic):
