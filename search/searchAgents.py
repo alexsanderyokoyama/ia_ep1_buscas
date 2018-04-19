@@ -41,6 +41,7 @@ import util
 import itertools
 import time
 import search
+import math
 
 class GoWestAgent(Agent):
     "An agent that goes West until it can't."
@@ -285,20 +286,29 @@ class CornersProblem(search.SearchProblem):
         # in initializing the problem
         "*** YOUR CODE HERE ***"
 
+        # Atualiza cantos para uma lista ao inves de tupla
+        self.corners = (1,1), (1,top), (right, 1), (right, top)
+
     def getStartState(self):
         """
         Returns the start state (in your state space, not the full Pacman state
         space)
         """
         "*** YOUR CODE HERE ***"
-        util.raiseNotDefined()
+
+        # Retorna um par [posicao initical, [cantos nao visitados]]
+        # Posicao inicial e o mesmo vetor [x, y] e cantos nao visitados e uma lista de vetores [x, y] de todos os cantos ainda nao visitados
+        return (self.startingPosition, self.corners)
 
     def isGoalState(self, state):
         """
         Returns whether this search state is a goal state of the problem.
         """
         "*** YOUR CODE HERE ***"
-        util.raiseNotDefined()
+        
+        # Checa se todos os cantos foram visitados
+        # Como o estado carrega no par todos os cantos nao visitados, basta checar se esta vazio
+        return state[1]==[]
 
     def getSuccessors(self, state):
         """
@@ -321,6 +331,32 @@ class CornersProblem(search.SearchProblem):
             #   hitsWall = self.walls[nextx][nexty]
 
             "*** YOUR CODE HERE ***"
+            # Calcula variacao de x e y causadas pela acao
+            vx, vy = Actions.directionToVector(action)            
+
+            # Calcula posicao do actor depois de execuada a acao (x,y atual + vx,vy)
+            # Casta para Int pois sao indices de lista
+            novoX = int(state[0][0] + vx)
+            novoY = int(state[0][1] + vy)
+            novaPos = (novoX, novoY)
+
+            # Checa se a nova posicao newX,newY e valida (se nao ha paredes)
+            if not self.walls[novoX][novoY]:
+                # Inicializa o custo
+                cost = 1
+
+                # Checa se nova posicao e um canto
+                if novaPos in state[1]:
+                    # Duplica lista de cantos
+                    atualizaCantos = list(state[1])
+                    # Remove o canto visitado
+                    atualizaCantos.remove(novaPos)
+                    # Adiciona a lista de sucessores ([posicao, lista de cantos], acao, custo)
+                    successors.append(((novaPos, atualizaCantos), action, cost))
+                else:
+                    # Se a posicao nao e um cato, apenas atualiza sucessor com cantos antigos
+                    successors.append(((novaPos, state[1]), action, cost))
+
 
         self._expanded += 1 # DO NOT CHANGE
         return successors
@@ -352,11 +388,46 @@ def cornersHeuristic(state, problem):
     shortest path from the state to a goal of the problem; i.e.  it should be
     admissible (as well as consistent).
     """
+
+    if problem.isGoalState(state[0]):
+        return 0
+
     corners = problem.corners # These are the corner coordinates
     walls = problem.walls # These are the walls of the maze, as a Grid (game.py)
 
     "*** YOUR CODE HERE ***"
-    return 0 # Default to trivial solution
+    # Como heuristica utilizaremos a distancia euclidiana A^2 = B^2 + C^2 entre os cantos e a posicao atual. 
+    # A cada canto visitado, e recalculada a distancia entre a nova posicao e os outros cantos.
+    # A heuristica final sera a soma em linha reta em ordem dos cantos visitados.
+    
+    # Inicializa posicao inical do ator
+    x, y = state[0]
+
+    # Copia lista de cantos para calcular as distancias e escolher a menor
+    cantos = list(state[1])
+
+    # Inicializa heuristica como 0
+    heuristica = 0
+
+    cantoMaisProximo = ()
+    while cantos:
+        minimo = float("inf")
+        for cx, cy in cantos:
+            # Calcula distancia entre posicao atual e cada canto
+            dist = math.sqrt(math.pow(cx - x, 2) + math.pow(cy - y, 2))
+            if(dist < minimo):
+                # Seleciona o canto mais proximo
+                minimo = dist
+                cantoMaisProximo = (cx, cy)
+        
+        # Remove o canto selecionado e atualiza posicao atual para ele
+        cantos.remove(cantoMaisProximo)
+        x, y = cantoMaisProximo
+
+        # Incrementa heuristica
+        heuristica += minimo
+
+    return heuristica
 
 
 class AStarCornersAgent(SearchAgent):
