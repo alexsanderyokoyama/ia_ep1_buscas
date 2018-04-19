@@ -94,61 +94,98 @@ def depthFirstSearch(problem):
     # Initializes array of visited states
     visited = []
 
-    # Initializes path list
-    path = []
+    # Get initial pos
+    pos = problem.getStartState()
+    actionList = []
 
     # Pushes initial state into stack
-    stack.push([(problem.getStartState(), "Stop", 0)])
+    stack.push((pos, actionList))
+    
+    # Set initial pos as visited
+    visited.append(pos)
     
     # Run search while there are states to be checked
     while not stack.isEmpty():
-        # Get the path from the stack. 
-        path = stack.pop()
-        print(path)
+        # Get current node from stack
+        currentNode = stack.pop()
+        pos = currentNode[0]
+        actionList = currentNode[1]
 
-        # Get the current position (last path taken)
-        currentPosition = path[-1][0]
-        print "Current position is ", currentPosition
-        
-        # Check if current state is the goal, return the action path if true
-        if problem.isGoalState(currentPosition):
-            print "Current state is Goal State, returning path."
-            actionPath = []
-            for action in path:
-                actionPath.append(action[1])
-            return actionPath
-        else:
-            print "Current state is not Goal State, expanding."
-
-        # If theres only the initial state path, set path as empty
-        if(path == problem.getStartState):
-            path = []
+        # Iterate all successors from current node
+        for successor in problem.getSuccessors(pos):
+            # Get successors pos and action from node
+            succPos = successor[0]
+            succAction = successor[1]
             
-        # Check if current state wasnt visited before
-        if currentPosition not in visited:
-            # Set state as visited
-            visited.append(currentPosition)
+            # Check if successors are visited
+            if not visited.__contains__(succPos):
+                # Append successors action to action list (create new not to modify reference)
+                newList = list(actionList)
+                newList.append(succAction)
 
-            # Get successors of current state
-            successors = problem.getSuccessors(currentPosition)
-            for successor in successors:
-                # Check if successor position wasnt visited
-                successorPos = successor[0]
-                if successorPos not in visited:
-                    # If not, append successors path to current path
-                    successorPath = path[:]
-                    successorPath.append(successor)
-                    
-                    # Push the complete path to the stack
-                    stack.push(successorPath)
+                # Check if the goal was found
+                if problem.isGoalState(succPos):
+                    # Return action list
+                    print newList
+                    return newList
+                else:
+                    # Set node as visited and push to stack
+                    visited.append(succPos)
+                    stack.push((succPos, newList))
             
     # Return "Stop" action to do nothing if no path is found
-    return ["Stop"]
+    return []
 
 def breadthFirstSearch(problem):
     """Search the shallowest nodes in the search tree first."""
     "*** YOUR CODE HERE ***"
-    util.raiseNotDefined()
+    # Initializes the Queue
+    queue = util.Queue()
+
+    # Initializes array of visited states
+    visited = []
+
+    # Get initial pos
+    pos = problem.getStartState()
+    actionList = []
+
+    # Pushes initial state into stack
+    queue.push((pos, actionList))
+    
+    # Set initial pos as visited
+    visited.append(pos)
+    
+    # Run search while there are states to be checked
+    while not queue.isEmpty():
+        # Get current node from stack
+        currentNode = queue.pop()
+        pos = currentNode[0]
+        actionList = currentNode[1]
+
+        # Iterate all successors from current node
+        for successor in problem.getSuccessors(pos):
+            # Get successors pos and action from node
+            succPos = successor[0]
+            succAction = successor[1]
+            
+            # Check if successors are visited
+            if not visited.__contains__(succPos):
+                # Append successors action to action list (create new not to modify reference)
+                newList = list(actionList)
+                newList.append(succAction)
+
+                # Check if the goal was found
+                if problem.isGoalState(succPos):
+                    # Return action list
+                    print newList
+                    return newList
+                else:
+                    # Set node as visited and push to stack
+                    visited.append(succPos)
+                    queue.push((succPos, newList))
+            
+    # Return "Stop" action to do nothing if no path is found
+    return []
 
 
 def uniformCostSearch(problem):
