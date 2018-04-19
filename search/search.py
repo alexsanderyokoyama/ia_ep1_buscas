@@ -88,7 +88,7 @@ def depthFirstSearch(problem):
     """
     "*** YOUR CODE HERE ***"
     
-    # Pilha de nos
+    # fila de nos
     pilha = util.Stack()
     # Array de coordenadas ja visitadas
     coordVisitados = []
@@ -108,15 +108,40 @@ def depthFirstSearch(problem):
             if(problem.isGoalState(atualCoord)):    # Se eh o objetivo, retorna o caminho ate chegar neste no
 				return atualCaminho 
             sucessores = problem.getSuccessors(atualCoord)  # Encontrar todos os nos vizinhos
-            listaDeSucessores = list(sucessores)            # Cria lista para explorar os vizinhos
+            listaDeSucessores = sucessores[:]               # Cria lista para explorar os vizinhos
             for sucessor in listaDeSucessores:              # Expande os nos vizinhos, na sequencia da lista
                 if sucessor[0] not in coordVisitados:       # Se o vizinho ainda nao foi visitado, coloca na lista
                     pilha.push((sucessor[0], sucessor[1], atualCaminho + [sucessor[1]]))
     return[]
 
+# Igual o depthFirstSearch, porem utilizando Fila em vez de Pilha
 def breadthFirstSearch(problem):
     """Search the shallowest nodes in the search tree first."""
-    "*** YOUR CODE HERE ***"
+    # Fila de nos
+    fila = util.Queue()
+    # Array de coordenadas ja visitadas
+    coordVisitados = []
+    # No de inicio  (coordenada do no, direcao, caminho percorrido ate este no)
+    noInicial = (problem.getStartState(), None, [])
+    # Insere o primeiro inicial na lista de nos
+    fila.push(noInicial) 
+    
+    # Itera ate que a fila esteja vazia
+    while not fila.isEmpty():
+        atual = fila.pop()                         # Remove o no do topo da fila 
+        atualCoord = atual[0]                       # Guarda a coordenada do no atual
+        atualAcao = atual[1]                        # Guarda a acao (direcao) pela qual se chegou no no atual
+        atualCaminho = atual[2]                     # Guarda o caminho ate ter chegado neste no atual
+        if(atualCoord not in coordVisitados):       # Se o no atual ainda nao foi visitado, continuar
+            coordVisitados.append(atualCoord)       # Adiciona a coord do atual na lista de visitados
+            if(problem.isGoalState(atualCoord)):    # Se eh o objetivo, retorna o caminho ate chegar neste no
+				return atualCaminho 
+            sucessores = problem.getSuccessors(atualCoord)  # Encontrar todos os nos vizinhos (sucessores)
+            listaDeSucessores = sucessores[:]               # Cria lista para explorar os vizinhos
+            for sucessor in listaDeSucessores:              # Expande os nos vizinhos, na sequencia da lista
+                if sucessor[0] not in coordVisitados:       # Se o vizinho ainda nao foi visitado, coloca na lista
+                    fila.push((sucessor[0], sucessor[1], atualCaminho + [sucessor[1]]))
+    return[]
     util.raiseNotDefined()
 
 
