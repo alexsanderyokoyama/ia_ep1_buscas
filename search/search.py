@@ -1,3 +1,10 @@
+###########################################
+# EP1 - ACH2016 - Inteligencia Artificial #
+#                                         #
+# Alexsander Yokoyama - 8598707           #
+# Matheus P. Pinheiro - 8623799           #
+###########################################
+
 # search.py
 # ---------
 # Licensing Information:  You are free to use or extend these projects for
